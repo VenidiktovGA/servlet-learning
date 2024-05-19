@@ -2,16 +2,16 @@ package ru.venidiktov.http.socket;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Scanner;
 
 @Slf4j
-public class SocketEx {
+public class _2SocketClient {
     public static void main(String[] args) throws IOException {
         /**
          * При создании Socket (Гнездо) можно указать DNS имя ресурса и TCP порт (так как Socket работает с TCP)
@@ -28,25 +28,24 @@ public class SocketEx {
          *
          * В данном примере получаем в ответ 301 и соединение сразу не закрывается
          */
-        InetAddress inetAddressGitHub = Inet4Address.getByName("github.com");
-        try (var socket = new Socket(inetAddressGitHub, 80);
-             var printWriter = new PrintWriter(socket.getOutputStream()); //удобнее работать со стримами через обертку, например PrintWriter
-             var bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) { //удобнее работать со стримами через обертку, например BufferedReader
-            //Составляем запрос к серверу руками
-            var request = """
-                    GET /VenidiktovGA HTTP/1.1
-                    Host: %s
-                    """.formatted(inetAddressGitHub.getHostName());
-            log.warn("---- Запрос на сервер ----\n {}", request);
-            printWriter.println(request);
-            printWriter.flush();
+        InetAddress localhostAddress = Inet4Address.getByName("localhost");
+        try (var socket = new Socket(localhostAddress, 9999);
+             var outputRequest = new DataOutputStream(socket.getOutputStream()); //удобнее работать со стримами через обертку, например DataOutputStream
+             var inputResponse = new DataInputStream(socket.getInputStream()); //удобнее работать со стримами через обертку, например BufferedReader
+             var scanner = new Scanner(System.in)) {
 
-            log.info("---- Читаем ответ от сервера ----");
-            String outputString;
-            while ((outputString = bufferedReader.readLine()) != null) {
-                log.info(outputString);
+            log.info("Введите запрос: ");
+            while (scanner.hasNextLine()) {
+                var request = scanner.nextLine();
+                outputRequest.writeUTF(request);
+                log.info("---- Ответ от сервера ----\n{}", inputResponse.readUTF());
+                log.info("Введите запрос: ");
             }
         } catch (IOException e) {
+            /**
+             * При отправке на сервер слова 'stop' сервер закроет соединение и тут на стороне
+             * клиент будет выброшен java.io.EOFException!
+             */
             throw new RuntimeException(e);
         }
     }
