@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!--Заголовок-->
+<!--XML файл отражающий структуру http сообщения-->
+<request> <!--xml всегда содержит корневой элемент-->
+    <start-row>
+        <method>GET</method>
+        <url>www.google.com</url>
+        <version protocol="https">1.1</version> <!--protocol это атрибут тега-->
+    </start-row>
+    <headers>
+        <header name="content-type" type="text/html"/>
+        <header name="accept" type="application/json"/>
+    </headers>
+    <body></body>
+</request>
