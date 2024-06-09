@@ -31,7 +31,7 @@ public class UrlEx {
         URLConnection urlConnection = googleUrl.openConnection();
 
         /**
-         * Класс URL по умолчанию работает с GET методом, можно и работать с другими методами но не очень удобно
+         * Класс URL по умолчанию работает с GET методом, можно и работать с другими методами, но не очень удобно
          */
 //        urlConnection.setDoInput(true); //Говорим что мы хотим отправить тело в запроса
 //        try(var outputStream = urlConnection.getOutputStream()) {
